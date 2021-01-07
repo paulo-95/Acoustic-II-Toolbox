@@ -12,18 +12,18 @@ classdef Mesh
         
         Connectivity;
         nElementsX = 1;
-        nElementsZ = 1;
+        nElementsY = 1;
         nElements;
         
         xCoordinates;
-        zCoordinates;
+        yCoordinates;
         deltaX;
-        deltaZ;
+        deltaY;
         
         
         nDofNode;
         nNodesX;
-        nNodesZ;
+        nNodesY;
         nNodes;
         
         nodeCoordinates;
@@ -52,8 +52,8 @@ classdef Mesh
             end
             
             obj.nElementsX = Properties.nElementsX;
-            obj.nElementsZ = Properties.nElementsZ;
-            obj.nElements  = obj.nElementsX*obj.nElementsZ;
+            obj.nElementsY = Properties.nElementsY;
+            obj.nElements  = obj.nElementsX*obj.nElementsY;
             
             obj.nDofNode = Properties.nDofNode;
             
@@ -77,53 +77,52 @@ classdef Mesh
                 case 'Fluid'
                     % Quadrilateral elements with 4 nodes and 4 dofs. Counterclockwise numbering.
                     obj.deltaX = obj.length/obj.nElementsX;
-                    obj.deltaZ = obj.height/obj.nElementsZ;
+                    obj.deltaY = obj.height/obj.nElementsY;
                     
                     obj.xCoordinates = 0:obj.deltaX:obj.deltaX*obj.nElementsX;
-                    obj.zCoordinates = 0:obj.deltaZ:obj.deltaZ*obj.nElementsZ;
+                    obj.yCoordinates = 0:obj.deltaY:obj.deltaY*obj.nElementsY;
                     
-                    obj.nodeCoordinates = cat(3,meshgrid(obj.xCoordinates, obj.zCoordinates),....
-                        0*meshgrid(obj.xCoordinates, obj.zCoordinates),...
-                        meshgrid(obj.zCoordinates, obj.xCoordinates)');
+                    obj.nodeCoordinates = cat(3,meshgrid(obj.xCoordinates, obj.yCoordinates),....
+                        meshgrid(obj.yCoordinates, obj.xCoordinates)',...
+                        0*meshgrid(obj.xCoordinates, obj.yCoordinates));
                     
                     
                     obj.nNodesX = obj.nElementsX + 1;
-                    obj.nNodesZ = obj.nElementsZ + 1;
-                    obj.nNodes  = obj.nNodesX*obj.nNodesZ;
+                    obj.nNodesY = obj.nElementsY + 1;
+                    obj.nNodes  = obj.nNodesX*obj.nNodesY;
                     
                 case 'Structure'
                     % Element with 2 nodes and 4 dofs.
                     
                     if obj.length > obj.height
                         obj.nNodesX = obj.nElementsX + 1;
-                        obj.nNodesZ = 1;
-                        obj.nNodes  = obj.nNodesX*obj.nNodesZ;
+                        obj.nNodesY = 1;
+                        obj.nNodes  = obj.nNodesX*obj.nNodesY;
                         
                         obj.deltaX = obj.length/obj.nElements;
-                        obj.deltaZ = 0;
+                        obj.deltaY = 0;
                         obj.xCoordinates = 0:obj.deltaX:obj.deltaX*obj.nElements;
-                        obj.zCoordinates = 0*obj.xCoordinates;
+                        obj.yCoordinates = 0*obj.xCoordinates;
                         
-
                         obj.nodeCoordinates = cat(3,meshgrid(obj.xCoordinates, 1),....
-                            0*meshgrid(obj.xCoordinates, 1),...
-                            meshgrid(obj.zCoordinates, 1));
+                            meshgrid(obj.yCoordinates, 1),...
+                            0*meshgrid(obj.xCoordinates, 1));
                         
                     else
                         obj.nNodesX = 1;
-                        obj.nNodesZ = obj.nElementsZ + 1;
-                        obj.nNodes  = obj.nNodesX*obj.nNodesZ;
+                        obj.nNodesY = obj.nElementsY + 1;
+                        obj.nNodes  = obj.nNodesX*obj.nNodesY;
                         
                         obj.deltaX = 0;
-                        obj.deltaZ =  obj.height/obj.nElements;
+                        obj.deltaY =  obj.height/obj.nElements;
                         
-                        obj.zCoordinates = 0:delta:delta*obj.nElements;
-                        obj.xCoordinates = 0*obj.zCoordinates;
-                        
+                        obj.yCoordinates = 0:delta:delta*obj.nElements;
+                        obj.xCoordinates = 0*obj.yCoordinates;
                         
                         obj.nodeCoordinates = cat(3,meshgrid(obj.xCoordinates, 1),....
-                            0*meshgrid(obj.xCoordinates, 1),...
-                            meshgrid(obj.zCoordinates, 1));
+                            meshgrid(obj.yCoordinates, 1),...
+                            0*meshgrid(obj.xCoordinates, 1));
+                        
                     end
                     
             end
@@ -143,12 +142,12 @@ classdef Mesh
                     % Quadrilateral elements with 4 nodes and 4 dofs. Counterclockwise numbering.
                     obj.Connectivity = ones(obj.nElements, 1)*[1, 2, obj.nNodesX + 2, obj.nNodesX + 1];
                     
-                    for iElementZ = 1 : obj.nElementsZ
+                    for iElementY = 1 : obj.nElementsY
                         for iElementX = 1 : obj.nElementsX
                             
-                            iElement = iElementX + (iElementZ-1)*obj.nElementsX;
+                            iElement = iElementX + (iElementY-1)*obj.nElementsX;
                             obj.Connectivity(iElement, :) = ...
-                                obj.Connectivity(iElement, :) + (iElementX - 1) + (iElementZ - 1)*obj.nNodesX;
+                                obj.Connectivity(iElement, :) + (iElementX - 1) + (iElementY - 1)*obj.nNodesX;
                             
                         end
                     end
