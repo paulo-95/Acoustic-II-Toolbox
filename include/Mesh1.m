@@ -1,8 +1,7 @@
 classdef Mesh
     %MESH Creates a Fluid or Structure Mesh
-    %   Structures Mesh :  Uses a 1D Mesh with nDofNode DOF's
-    %   Fluid Mesh : Uses a Quadrilateral element with 4 Nodes and 4 DOFS
-    
+    %
+    %
     properties
         
         representation;
@@ -11,15 +10,14 @@ classdef Mesh
         height = 1;
         
         Connectivity;
-        nElementsX = 1;
-        nElementsZ = 1;
+        nElementsX;
+        nElementsZ;
         nElements;
         
         xCoordinates;
         zCoordinates;
         deltaX;
         deltaZ;
-        
         
         nDofNode;
         nNodesX;
