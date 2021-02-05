@@ -7,6 +7,21 @@
 clearvars 
 close all
 
+% set plot window behavior
+set(0,'DefaultFigureWindowStyle','normal') 
+
+% add & change path
+path_2_file = mfilename('fullpath');
+
+% always change to the folder where this file is located at and add inlcude
+% folder
+path_2_file = path_2_file(1:end-length(mfilename));
+cd(path_2_file);
+addpath(genpath('include'));
+
+
+
+
 
 % Define the Properties of the fluid domain
 PropertiesFluidDomain.representation = 'Fluid';
