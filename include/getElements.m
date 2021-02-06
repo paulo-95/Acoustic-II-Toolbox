@@ -1,7 +1,7 @@
 function Elements = getElements(DOMAIN)
 %%GETELEMENTS 
 %  INPUT:
-%     -   Elementtype :
+%     -   DOMAIN :
 %  OUTPUT:
 %     -   functionElements:
 

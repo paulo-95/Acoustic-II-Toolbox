@@ -14,8 +14,6 @@ classdef Mesh2D
         nNodes;
         nDofNode;
         nodeCoordinates;
-        
-        zDiscretizationDisp
         nodeCoordinatesDisp;
         
         connectivityElementsDOF;
@@ -87,18 +85,17 @@ classdef Mesh2D
             obj.xDiscretization = 0:obj.deltaX:obj.deltaX*obj.nElementsX;
             if (obj.deltaZ ==1 && obj.ndofElement/obj.nDofNode==2)
                 obj.zDiscretization = obj.deltaZ/2;
-                obj.zDiscretizationDisp = 0:obj.deltaZ:obj.deltaZ*obj.nElementsZ;
-                obj.nodeCoordinatesDisp = cat(3,meshgrid(obj.xDiscretization+obj.xCoordinate...
-                    , obj.zDiscretizationDisp),0*meshgrid(obj.xDiscretization,...
-                    obj.zDiscretizationDisp+obj.zCoordinate),...
-                 meshgrid(obj.zDiscretizationDisp+obj.zCoordinate, obj.xDiscretization)');
+                zDiscretizationDisp = 0:obj.deltaZ:obj.deltaZ*obj.nElementsZ;
+                obj.nodeCoordinatesDisp = cat(3,meshgrid(obj.xDiscretization, zDiscretizationDisp),....
+                0*meshgrid(obj.xDiscretization, zDiscretizationDisp),...
+                 meshgrid(zDiscretizationDisp, obj.xDiscretization)');
             else
                 obj.zDiscretization = 0:obj.deltaZ:obj.deltaZ*obj.nElementsZ;
             end
                     
-            obj.nodeCoordinates = cat(3,meshgrid(obj.xDiscretization+obj.xCoordinate, obj.zDiscretization+obj.zCoordinate),....
-                0*meshgrid(obj.xDiscretization, obj.zDiscretization+obj.zCoordinate),...
-                meshgrid(obj.zDiscretization+obj.zCoordinate, obj.xDiscretization)');
+            obj.nodeCoordinates = cat(3,meshgrid(obj.xDiscretization+obj., obj.zDiscretization),....
+                0*meshgrid(obj.xDiscretization, obj.zDiscretization),...
+                meshgrid(obj.zDiscretization, obj.xDiscretization)');
             
         end
         

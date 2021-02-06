@@ -6,6 +6,7 @@
 
 clearvars 
 close all
+clear class
 
 % set plot window behavior
 set(0,'DefaultFigureWindowStyle','normal') 
@@ -22,12 +23,18 @@ addpath(genpath('include'));
 
 %% Input
 
+% Load Properties and Settings Fluid and create Object
+STRUCTURE = getStructure();
+STRUCTURE = Structure(STRUCTURE);
+% Load Properties and Settings Fluid and create Object
+FLUID = getFluid(STRUCTURE);
+FLUID = Fluid(FLUID);
+
 % Load Properties and Settings 
 PROPERTIES = getProb();
 
-% Create PlaceHolder for Domains
-STRUCTURE = PROPERTIES.STRUCTURE;
-FLUID = PROPERTIES.FLUID;
+%Allign Globally
+STRUCTURE.position = [0;0;FLUID.height];
 
 %Load Elements
 STRUCTURE.Elements = getElements(STRUCTURE);
