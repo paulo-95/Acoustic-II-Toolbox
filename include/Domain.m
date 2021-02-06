@@ -7,6 +7,7 @@ classdef (Abstract) Domain < handle
         length;
         thickness;
         height;
+        objective;
         Elements = struct('ElementType',[],'nElementsX',[],'nElementsZ',[]);
         position = [0;0;0];
         Mesh;
@@ -17,6 +18,7 @@ classdef (Abstract) Domain < handle
         function obj = Domain(Properties)
             %DOMAIN Construct an instance of this class
             %   Detailed explanation goes here
+            obj.objective = Properties.objective;
             obj.density = Properties.density;
             obj.length = Properties.length;
             obj.thickness = Properties.thickness;

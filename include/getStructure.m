@@ -5,6 +5,8 @@ function STRUCTURE = getStructure()
 %  OUTPUT:
 %     -   functionSTRUCTURE:
 
+STRUCTURE.objective = 'Displacement';
+
 % Geometry
 STRUCTURE.length              = 10;
 STRUCTURE.thickness           = 0.2;

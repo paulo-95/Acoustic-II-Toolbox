@@ -5,6 +5,8 @@ function FLUID = getFluid(STRUCTURE)
 %  OUTPUT:
 %     -   FLUID:
 
+FLUID.objective = 'Acoustics';
+
 % Geometry
 FLUID.length       = STRUCTURE.length;
 FLUID.height       = 4;

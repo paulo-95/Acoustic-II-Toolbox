@@ -74,7 +74,7 @@ classdef Mesh2D
 
             obj.nNodesX =  (obj.ndofElement / obj.nDofNode) * obj.nElementsX;
             obj.nNodesZ =  (obj.ndofElement / obj.nDofNode) * obj.nElementsZ;
-            obj.nNodes = obj.nNodesX*obj.nNodesZ;
+            obj.nNodes = obj.nElements * obj.ndofElement/obj.nDofNode;
 
             obj.deltaX = obj.sizeX/obj.nElementsX;
             obj.deltaZ = obj.sizeZ/obj.nElementsZ;
@@ -108,7 +108,6 @@ classdef Mesh2D
             %   Detailed explanation goes here
            connectivityNodesDOF = ones(obj.nNodes, 1)*(1:obj.nDofNode)...
                +(0:obj.nDofNode:(obj.nNodes-1)*obj.nDofNode)'*ones(1, obj.nDofNode);
-
         end
         
                 
@@ -116,14 +115,13 @@ classdef Mesh2D
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
 
-                    Connectivity = ones(obj.nElements, 1)*[1, 2, obj.nNodesX + 2, obj.nNodesX + 1];
+                    Connectivity = ones(obj.nElements,1) * (1:obj.ndofElement);
                     
                     for iElementZ = 1 : obj.nElementsZ
                         for iElementX = 1 : obj.nElementsX
-                            
                             iElement = iElementX + (iElementZ-1)*obj.nElementsX;
                             Connectivity(iElement, :) = ...
-                                Connectivity(iElement, :) + (iElementX - 1) + (iElementZ - 1)*obj.nNodesX;
+                                Connectivity(iElement, :) + (iElementX-1)*obj.ndofElement + (iElementZ - 1)*obj.nNodesX;
                             
                         end
                     end
