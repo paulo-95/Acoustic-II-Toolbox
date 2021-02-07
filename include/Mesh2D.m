@@ -18,6 +18,7 @@ classdef Mesh2D
         zDiscretizationDisp
         nodeCoordinatesDisp;
         
+        local_connect;
         connectivityElementsDOF;
         connectivityNodesDOF;
         
@@ -62,6 +63,7 @@ classdef Mesh2D
             obj.yCoordinate = Domain.position(2);
             obj.zCoordinate = Domain.position(3);
             
+            obj.local_connect = Domain.Elements.local_connect;
             obj = setProperties(obj); %Call setter method
         
             obj = setNodeCoordinates(obj);
@@ -114,20 +116,23 @@ classdef Mesh2D
         function Connectivity = getConnectivityElement(obj)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-
-                    Connectivity = ones(obj.nElements,1) * (1:obj.ndofElement);
                     
+                    Connectivity = ones(obj.nElements,1) * obj.local_connect(obj.nNodesX,obj.nElementsX);
+
                     for iElementZ = 1 : obj.nElementsZ
                         for iElementX = 1 : obj.nElementsX
+                            
                             iElement = iElementX + (iElementZ-1)*obj.nElementsX;
                             Connectivity(iElement, :) = ...
-                                Connectivity(iElement, :) + (iElementX-1)*obj.ndofElement + (iElementZ - 1)*obj.nNodesX;
+                                Connectivity(iElement, :) + (iElementX - 1)*obj.nDofNode + (iElementZ - 1)*obj.nNodesX/obj.nElementsX;
                             
                         end
                     end
                     
                     
         end
+        
+        
         
         
         
