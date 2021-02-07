@@ -20,6 +20,7 @@ STRUCTURE.areaMomentIntertia  = 1.33e-4;
 %Elements 
 STRUCTURE.Elements.ElementType =   "Beam";
 STRUCTURE.Elements.nElementsX =     3;
+STRUCTURE.Elements.IntegrationOrder = 2;
 
 % Rayleigh Damping
 STRUCTURE.Rayleigh.alpha = 0.01;

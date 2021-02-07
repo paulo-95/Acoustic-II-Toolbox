@@ -9,58 +9,94 @@ classdef Assemble < handle
         StiffnessMatrix
         DampingMatrix
         N_sym;
-        N;
-        B;
+        J;
+        B_sym;
         C;
         vars;
-        
+        r;
+        s;
+        ar;
+        as;
+        nIntegrationPoints;
+        thickness;
+        crossArea;
     end
 
     methods
         function obj = Assemble(Domain)
             %ASSEMBLE Construct an instance of this class
             %   Detailed explanation goes here
+            obj.ElementMassMatrix = zeros(Domain.Elements.DOFperElement);
+            obj.ElementStiffnessMatrix = zeros(Domain.Elements.DOFperElement);
+            
+            obj.MassMatrix = zeros(Domain.Mesh.connectivityElementsDOF(end:end));
+            obj.StiffnessMatrix = zeros(Domain.Mesh.connectivityElementsDOF(end:end));
+            
+            obj.thickness = Domain.thickness;
+            if()
+                obj.crossArea = Domain.areaCrossSection;
+            end
+            
+            obj =  setGaussian(obj,Domain);
+            obj = setShapeFunctions(obj,Domain);
+            obj.J = getJacobian(obj,Domain);
+            obj.C = Domain.Elements.MaterialMatrixC;
+            
+
+            obj. ElementStiffnessMatrix = getElementStiffness(obj,Domain);
+            obj. ElementMassMatrix = getElementMass(obj);
+
+     
+        end
+        
+        function obj =  setGaussian(obj,Domain)
+            if (Domain.Elements.IntegrationOrder == 1)
+                obj.r = 0;
+                obj.s = 0;
+                obj.as = 2;
+                obj.ar = 2;
+                obj.nIntegrationPoints = 1;
+            else
+                if (Domain.Elements.IntegrationOrder == 2)
+                obj.r = 1/sqrt(3)*[-1, 1, 1, -1];
+                obj.s = 1/sqrt(3)*[-1, -1, 1, 1];
+                obj.as = 1;
+                obj.ar = 1;
+                obj.nIntegrationPoints = 4;
+            else
+                warning('The chosen Integration Order is not implemented yet Please use Integration Order 1 or 2')
+                end
+            end
+            
+        end
+        
+        function obj = setShapeFunctions(obj,Domain)
             obj.N_sym = Domain.Elements.ShapeFunktions;
             obj.vars = Domain.Elements.Syms;
-            obj.N = matlabFunction(obj.N_sym);
-            obj.J = getJacobian(obj);
-            obj.C = Domain.Elements.MaterialMatrixC;
-            obj.B = calculateB(obj);
-           
-            
-            obj. ElementStiffnessMatrix = getElementStiffness(obj,Domain);
-            
-            
-            obj.MassMatrix = zeros(Domain.Mesh.nNodes*Properties.nDofNode);
-            
-            obj.StiffnessMatrix = zeros(Mesh.nNodes*Properties.nDofNode);
-            
-          
-        end
-        
-        function J = getJacobian(obj)
-            
-            
+            obj.B_sym = jacobian(obj.N_sym,obj.vars)';
+
         end 
         
-        function B =  calculateB(obj)
-            B = jacobian(obj.N_sym,obj.vars);
-            B = matlabFunction(B);
-        end
+        function J = getJacobian(obj,Domain)
+            % Jacobi matrix
+                J = [Domain.Mesh.deltaX/1, 0;
+                    0, Domain.Mesh.deltaZ/1];
+        end 
+        
         
         function Ke = getElementStiffness(obj,Domain)     
              switch Domain.objective
                 case 'Displacement'
-                    func = obj.B'*obj.C*obj.B*det(obj.J);
+                    func = matlabFunction(obj.B_sym'*obj.C*obj.B_sym*det(obj.J));
                 case 'Acoustics'
-                    func = Domain.soundSpeed^2*obj.B'*obj.B*det(obj.J);
+                    func = matlabFunction(Domain.soundSpeed^2*obj.B_sym'*obj.B_sym*det(obj.J));
             end       
-             Ke = intGaussian(func);  
+             Ke = intGaussian(func,obj);  
         end
         
-        function obj =  getElementMass(obj)
-                    func = obj.N'*obj.N*det(obj.J);
-                    Me = intGaussian(func);  
+        function Me =  getElementMass(obj)
+                    func =  matlabFunction(obj.N_sym'*obj.N_sym*det(obj.J));
+                    Me = intGaussian(func,obj);  
         end 
 
         function obj = getGlobal(obj)
@@ -79,21 +115,24 @@ classdef Assemble < handle
         end 
         
         
-        function Func = intGaussian(fun)
+        function Func = intGaussian(fun,obj)
             % fun(r,s)
             %Gausspoints
-            r = 1/sqrt(3)*[-1, 1, 1, -1];
-            s = 1/sqrt(3)*[-1, -1, 1, 1];
-
-            %Gaussweights
-            ar = [1, 1, 1, 1];
-            as = [1, 1, 1, 1];
-        
-            Func = zeros(size(fun));
-            for i = 1:1:length(r)
-                for j = 1:1:length(s)   
-                        Func = Func + ar(i)*as(j)*fun(i,j);
-                end
+            
+            Func = zeros(size(obj.ElementMassMatrix));
+            
+            if (length(obj.vars)==1)
+                 for i = 1:1:length(obj.r)
+                     Func = Func + obj.ar*fun(obj.r(i))*obj.crossArea;
+                 end 
+            else
+                for i = 1:1:length(obj.r)
+                    for j = 1:1:length(obj.s)
+                            %if nargin
+                            Func = Func + obj.ar*obj.as*fun(obj.r(i),obj.s(j))*obj.thickness;
+                    end
+                end 
+                
             end 
 
         end

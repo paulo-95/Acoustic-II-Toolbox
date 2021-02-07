@@ -8,7 +8,7 @@ classdef (Abstract) Domain < handle
         thickness;
         height;
         objective;
-        Elements = struct('ElementType',[],'nElementsX',[],'nElementsZ',[]);
+        Elements = struct('ElementType',[],'nElementsX',[],'nElementsZ',[],'IntegrationOrder',[]);
         position = [0;0;0];
         Mesh;
         System;
@@ -32,6 +32,7 @@ classdef (Abstract) Domain < handle
                 obj.Elements.nElementsX = Properties.Elements.nElementsX;
             end
             obj.Elements.ElementType = Properties.Elements.ElementType;
+            obj.Elements.IntegrationOrder = Properties.Elements.IntegrationOrder;
         end
     end
 end
