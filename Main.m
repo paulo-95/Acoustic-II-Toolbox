@@ -49,6 +49,9 @@ FLUID.Mesh = Mesh2D(FLUID);
 STRUCTURE.System = Assemble(STRUCTURE);
 FLUID.System = Assemble(FLUID);
 
+%% Modes
+[ modeFrequencies, modeShapes ] = FLUID.System.getModes;
+
 
 %% Coupling
 %CoupledSystem = Couple(STRUCTURE,FLUID);

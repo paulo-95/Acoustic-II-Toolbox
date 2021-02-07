@@ -38,7 +38,8 @@ classdef Visualize
             % Plot Nodes
             plot3(Mesh.nodeCoordinates(:,:,1),Mesh.nodeCoordinates(:,:,2),Mesh.nodeCoordinates(:,:,3), 'o')
             view(180,0)
-        end     
+        end      
+        
     end
 end
 

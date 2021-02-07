@@ -8,8 +8,8 @@ function STRUCTURE = getStructure()
 STRUCTURE.objective = 'Displacement';
 
 % Geometry
-STRUCTURE.length              = 10;
-STRUCTURE.thickness           = 0.2;
+STRUCTURE.length              = 8;
+STRUCTURE.thickness           = 1;
 
 %Properties
 STRUCTURE.youngsModulus     	= 7.24e10;  
@@ -19,7 +19,7 @@ STRUCTURE.areaMomentIntertia  = 1.33e-4;
 
 %Elements 
 STRUCTURE.Elements.ElementType =   "Beam";
-STRUCTURE.Elements.nElementsX =     3;
+STRUCTURE.Elements.nElementsX =     2;
 STRUCTURE.Elements.IntegrationOrder = 2;
 
 % Rayleigh Damping

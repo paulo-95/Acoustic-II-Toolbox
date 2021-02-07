@@ -3,11 +3,11 @@ classdef Assemble < handle
     %   Detailed explanation goes here
 
     properties
-        ElementMassMatrix
-        ElementStiffnessMatrix
-        MassMatrix
-        StiffnessMatrix
-        DampingMatrix
+        ElementMassMatrix;
+        ElementStiffnessMatrix;
+        MassMatrix;
+        StiffnessMatrix;
+        DampingMatrix;
         N_sym;
         J;
         B_sym;
@@ -29,11 +29,11 @@ classdef Assemble < handle
             obj.ElementMassMatrix = zeros(Domain.Elements.DOFperElement);
             obj.ElementStiffnessMatrix = zeros(Domain.Elements.DOFperElement);
             
-            obj.MassMatrix = zeros(Domain.Mesh.connectivityElementsDOF(end:end));
-            obj.StiffnessMatrix = zeros(Domain.Mesh.connectivityElementsDOF(end:end));
+            obj.MassMatrix = zeros(max(Domain.Mesh.connectivityElementsDOF,[],'all'));
+            obj.StiffnessMatrix = zeros(max(Domain.Mesh.connectivityElementsDOF,[],'all'));
             
             obj.thickness = Domain.thickness;
-          %%%%Check if is field   if()
+            if(isprop(Domain,'areaCrossSection'))
                 obj.crossArea = Domain.areaCrossSection;
             end
             
@@ -45,8 +45,11 @@ classdef Assemble < handle
 
             obj. ElementStiffnessMatrix = getElementStiffness(obj,Domain);
             obj. ElementMassMatrix = getElementMass(obj);
-
-     
+            
+            obj = getGlobal(obj,Domain);
+            if(isprop(Domain,'Rayleigh'))
+                obj = getDampingMatrix(obj,Domain);
+            end 
         end
         
         function obj =  setGaussian(obj,Domain)
@@ -99,19 +102,19 @@ classdef Assemble < handle
                     Me = intGaussian(func,obj);  
         end 
 
-        function obj = getGlobal(obj)
+        function obj = getGlobal(obj,Domain)
 
-             for iElement = 1 : Mesh.nElements  
-
-                 dofElement = Mesh.dofElements(iElement, :);
-
-                 obj.MassMatrix(dofElement, dofElement) = massMatrix(dofElement, dofElement) + elementMassMatrix;
-                 obj.StiffnessMatrix(dofElement, dofElement) = stiffnessMatrix(dofElement, dofElement) + elementStiffnessMatrix;
+             for iElement = 1 : Domain.Mesh.nElements
+                 
+                 dofElement = Domain.Mesh.connectivityElementsDOF(iElement, :);
+                 obj.MassMatrix(dofElement, dofElement) = obj.MassMatrix(dofElement, dofElement) + obj.ElementMassMatrix;
+                
+                 obj.StiffnessMatrix(dofElement, dofElement) = obj.StiffnessMatrix(dofElement, dofElement) + obj.ElementStiffnessMatrix;
              end
         end
         
-        function obj = getDampingMatrix(obj)
-            obj.DampingMatrix = Properties.alpha*massMatrix + Properties.beta*stiffnessMatrix;
+        function obj = getDampingMatrix(obj,Domain)
+            obj.DampingMatrix = Domain.Rayleigh.alpha*obj.MassMatrix + Domain.Rayleigh.beta*obj.StiffnessMatrix;
         end 
         
         
@@ -136,7 +139,19 @@ classdef Assemble < handle
             end 
 
         end
-       
+        
+       function [ modeFrequencies, modeShapes ] = getModes(obj)
+
+            [modeShapes, eigenValues] = eig(obj.StiffnessMatrix, obj.MassMatrix);
+
+            eigenValues = diag(eigenValues);
+
+            [eigenValues, orderFrequencies] = sort(eigenValues);
+
+            modeShapes = modeShapes(:, orderFrequencies);
+
+            modeFrequencies = sqrt(eigenValues)/(2*pi);
+       end
     end
 end
 

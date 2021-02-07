@@ -10,6 +10,8 @@ classdef Mesh2D
         ndofElement;
         
         nNodesX;
+        localnNodeX;
+        localnNodeZ;
         nNodesZ;
         nNodes;
         nDofNode;
@@ -20,7 +22,6 @@ classdef Mesh2D
         
         local_connect;
         connectivityElementsDOF;
-        connectivityNodesDOF;
         
         sizeX;    %% Geometric properties
         sizeZ;
@@ -48,7 +49,8 @@ classdef Mesh2D
             else
                 obj.nElementsZ = Domain.Elements.nElementsZ;
             end
-            
+            obj.localnNodeX = Domain.Elements.localnNodeX;
+            obj.localnNodeZ = Domain.Elements.localnNodeZ;
             obj.ndofElement = Domain.Elements.DOFperElement;
             obj.nDofNode = Domain.Elements.DOFperNode;
             obj.sizeX = Domain.length;
@@ -74,8 +76,8 @@ classdef Mesh2D
         function obj = setProperties(obj)
             obj.nElements = obj.nElementsZ*obj.nElementsX;
 
-            obj.nNodesX =  (obj.ndofElement / obj.nDofNode) * obj.nElementsX;
-            obj.nNodesZ =  (obj.ndofElement / obj.nDofNode) * obj.nElementsZ;
+            obj.nNodesX =  obj.localnNodeX * obj.nElementsX;
+            obj.nNodesZ =  obj.localnNodeZ * obj.nElementsZ;
             obj.nNodes = obj.nElements * obj.ndofElement/obj.nDofNode;
 
             obj.deltaX = obj.sizeX/obj.nElementsX;
@@ -104,32 +106,12 @@ classdef Mesh2D
             
         end
         
-        
-%         function connectivityNodesDOF = getConnectivityNode(obj)
-%             %METHOD1 Summary of this method goes here
-%             %   Detailed explanation goes here
-%            connectivityNodesDOF = ones(obj.nNodes, 1)*(1:obj.nDofNode);
-%            
-%             for iElementZ = 1 : obj.nElementsZ
-%                         for iElementX = 1 : obj.nElementsX
-%                             iElement = iElementX + (iElementZ-1)*obj.nElementsX;
-%                             index = (1:obj.nNodes/obj.nElements)+ obj.nNodes/obj.nElements * (iElement-1);
-%                             connectivityNodesDOF(index , :) = connectivityNodesDOF(index, :) + ...
-%                                 (0:obj.nDofNode:obj.ndofElement/obj.nDofNode-1)' * ones(1,obj.nDofNode)+ obj.nNodes/obj.nElements * (iElementX-1)  + (iElementZ - 1)*obj.nNodesX/obj.nElementsX;
-%                         
-%                         end
-%                         
-%             end 
-%                %+(0:obj.nDofNode:(obj.nNodes-1)*obj.nDofNode)'*ones(1,
-%                %obj.nDofNode);
-%         end
-        
                 
         function Connectivity = getConnectivityElement(obj)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
                     
-                    Connectivity = ones(obj.nElements,1) * obj.local_connect(obj.nNodesX,obj.nElementsX);
+                    Connectivity = ones(obj.nElements,1) * obj.local_connect(obj.nElementsX);
 
                     for iElementZ = 1 : obj.nElementsZ
                         for iElementX = 1 : obj.nElementsX
@@ -137,7 +119,8 @@ classdef Mesh2D
                             iElement = iElementX + (iElementZ-1)*obj.nElementsX;
                             Connectivity(iElement, :) = ...
                                 Connectivity(iElement, :) + ...
-                                (iElementX - 1)*obj.nDofNode + (iElementZ - 1)*obj.nNodesX/obj.nElementsX;
+                                (iElementX - 1)*obj.nDofNode + (iElementZ - 1)*(obj.nElementsX+1);
+
                         end
                     end
                     

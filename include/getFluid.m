@@ -19,7 +19,7 @@ FLUID.density      = 1.21;
 %Elements
 FLUID.Elements.ElementType =   "Quadrilateral";
 FLUID.Elements.nElementsX  	= STRUCTURE.Elements.nElementsX;
-FLUID.Elements.nElementsZ    = 4;
+FLUID.Elements.nElementsZ    = 2;
 FLUID.Elements.IntegrationOrder = 2;
 
 end
