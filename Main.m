@@ -46,8 +46,8 @@ STRUCTURE.Mesh = Mesh2D(STRUCTURE);
 FLUID.Mesh = Mesh2D(FLUID);
 
 %% Assemble System
-%STRUCTURE.System = Assemble(STRUCTURE);
-%FLUID.System = Assemble(FLUID);
+STRUCTURE.System = Assemble(STRUCTURE);
+FLUID.System = Assemble(FLUID);
 
 
 %% Coupling

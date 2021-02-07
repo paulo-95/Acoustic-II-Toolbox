@@ -67,7 +67,7 @@ classdef Mesh2D
             obj = setProperties(obj); %Call setter method
         
             obj = setNodeCoordinates(obj);
-            obj.connectivityNodesDOF = getConnectivityNode(obj);          
+            %obj.connectivityNodesDOF = getConnectivityNode(obj);          
             obj.connectivityElementsDOF = getConnectivityElement(obj);
         end 
         
@@ -105,12 +105,24 @@ classdef Mesh2D
         end
         
         
-        function connectivityNodesDOF = getConnectivityNode(obj)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
-           connectivityNodesDOF = ones(obj.nNodes, 1)*(1:obj.nDofNode)...
-               +(0:obj.nDofNode:(obj.nNodes-1)*obj.nDofNode)'*ones(1, obj.nDofNode);
-        end
+%         function connectivityNodesDOF = getConnectivityNode(obj)
+%             %METHOD1 Summary of this method goes here
+%             %   Detailed explanation goes here
+%            connectivityNodesDOF = ones(obj.nNodes, 1)*(1:obj.nDofNode);
+%            
+%             for iElementZ = 1 : obj.nElementsZ
+%                         for iElementX = 1 : obj.nElementsX
+%                             iElement = iElementX + (iElementZ-1)*obj.nElementsX;
+%                             index = (1:obj.nNodes/obj.nElements)+ obj.nNodes/obj.nElements * (iElement-1);
+%                             connectivityNodesDOF(index , :) = connectivityNodesDOF(index, :) + ...
+%                                 (0:obj.nDofNode:obj.ndofElement/obj.nDofNode-1)' * ones(1,obj.nDofNode)+ obj.nNodes/obj.nElements * (iElementX-1)  + (iElementZ - 1)*obj.nNodesX/obj.nElementsX;
+%                         
+%                         end
+%                         
+%             end 
+%                %+(0:obj.nDofNode:(obj.nNodes-1)*obj.nDofNode)'*ones(1,
+%                %obj.nDofNode);
+%         end
         
                 
         function Connectivity = getConnectivityElement(obj)
@@ -124,8 +136,8 @@ classdef Mesh2D
                             
                             iElement = iElementX + (iElementZ-1)*obj.nElementsX;
                             Connectivity(iElement, :) = ...
-                                Connectivity(iElement, :) + (iElementX - 1)*obj.nDofNode + (iElementZ - 1)*obj.nNodesX/obj.nElementsX;
-                            
+                                Connectivity(iElement, :) + ...
+                                (iElementX - 1)*obj.nDofNode + (iElementZ - 1)*obj.nNodesX/obj.nElementsX;
                         end
                     end
                     
