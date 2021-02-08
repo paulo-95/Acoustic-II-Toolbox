@@ -76,7 +76,7 @@ classdef Assemble < handle
         function obj = setShapeFunctions(obj,Domain)
             obj.N_sym = Domain.Elements.ShapeFunktions;
             obj.vars = Domain.Elements.Syms;
-            obj.B_sym = jacobian(obj.N_sym,obj.vars)';
+            obj.B_sym = jacobian(obj.N_sym,obj.vars)';   %%%B Matrix -  transform ? 
 
         end 
         
